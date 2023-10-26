@@ -13,7 +13,9 @@ export class BookFileHandler {
   }
 
   writeMetaFile(book: Book) {
-    writeFileSync(join(this.bookPath, cleanIllegalCharacters(this.bookTitle) + ".json"), JSON.stringify(book));
+		const meta = Object.assign({}, book);
+		meta.chapters = []; //don't write the entire book to the meta file.
+    writeFileSync(join(this.bookPath, cleanIllegalCharacters(this.bookTitle) + ".json"), JSON.stringify(meta));
   }
 
   loadExistintChapters(): string[] {
