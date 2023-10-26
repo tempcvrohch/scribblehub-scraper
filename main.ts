@@ -1,100 +1,63 @@
 import "dotenv/config";
-import puppeteer, { Page, TargetType } from "puppeteer-core";
-import { writeFileSync } from "fs";
+import Scraper from "./src/scraper.js";
+import { platform, homedir } from "os";
+import { join } from "path";
+import { spawnSync, spawn } from "node:child_process";
 
-if (!process.env.CHAPTER1_URL) {
-  throw new Error("CHAPTER1_URL is needed in .env file.");
+if (!process.env.CHROME_EXE_PATH) {
+  throw new Error("CHROME_EXE_PATH was not found in .env file.");
 }
 
-(async () => {
-  //const browser = await puppeteer.launch({
-  //headless: false,
-  //ignoreDefaultArgs: ['--enable-automation'],
-  //executablePath: `C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe`
-  //});
+if (!process.env.CHAPTER1_URL) {
+  throw new Error("CHAPTER1_URL was not found in .env file.");
+}
 
-  const browserUrl = "http://127.0.0.1:9222";
-  const pageUrl = process.env.CHAPTER1_URL as string;
+const browserUrl = "http://127.0.0.1:9222";
+const pageUrl = process.env.CHAPTER1_URL as string;
 
-  const browser = await puppeteer.connect({
-    browserURL: browserUrl,
-    defaultViewport: null,
+async function main() {
+  const scraper = new Scraper(browserUrl, pageUrl);
+  await scraper.loadBrowser();
+	console.log("Connected to browser.");
+
+  const pageWasPreviouslyOpened = await scraper.openPageIfNeeded();
+	console.log("Book page opened.");
+  await scraper.startScrape();
+
+  if (!pageWasPreviouslyOpened) {
+    await scraper.unloadBrowser();
+  }
+}
+function spawnChrome() {
+  const childProcess = spawn(process.env.CHROME_EXE_PATH as string, [
+    "--remote-debugging-port=9222",
+    `--user-data-dir="${getChromeUserDataDirectory()}"`,
+  ]);
+
+  childProcess.stdout.on("data", (data) => {
+    console.log(`stdout: ${data}`);
   });
 
-  const paragraphSelector = ".chp_raw";
-  const targets = await browser.targets();
-  let page: Page | null = null;
-  let isPageOpenInSession = false;
-  let chapterIndex: number = 1;
+  childProcess.stderr.on("data", (data) => {
+    console.error(`stderr: ${data}`);
+  });
 
-  for (let target of targets) {
-    if (target.type() === TargetType.PAGE) {
-      let targetPage = await target.page();
-      if (targetPage?.url().includes(pageUrl)) {
-        page = targetPage;
-        isPageOpenInSession = true;
-        break;
-      }
-    }
+  childProcess.on("close", (code) => {
+    console.log(`Child process exited with code ${code}`);
+  });
+}
+
+function getChromeUserDataDirectory(): string | undefined {
+  switch (platform()) {
+    case "darwin": // macOS
+      return join(homedir(), "Library", "Application Support", "Google", "Chrome");
+    case "win32": // Windows
+      return join(homedir(), "AppData", "Local", "Google", "Chrome", "User Data");
+    case "linux": // Linux
+      return join(homedir(), ".config", "google-chrome");
+    default:
+      return undefined;
   }
+}
 
-  if (!page) {
-    console.log("Page not opened in current session, opening...");
-    page = await browser.newPage();
-    //await page.target().send('Emulation.clearDeviceMetricsOverride');
-    await page.setViewport({ width: 0, height: 0 });
-    await page.goto(pageUrl);
-  }
-
-  async function scrapeChapter(page: Page, chapterIndex: number) {
-    await page.waitForSelector(paragraphSelector);
-    const chapterTitle = await page.$eval(
-      ".chapter-title",
-      (el) => el.textContent
-    );
-
-    const chapterText = await page.evaluate((paragraphSelector) => {
-      const pars = document.querySelectorAll(paragraphSelector);
-      console.log(`Chapter title:`, pars[0].textContent);
-
-      let chapterText = "";
-      pars.forEach((par) => {
-        chapterText += par.textContent + `\n\n`;
-      });
-
-      return chapterText;
-    }, `${paragraphSelector} > p`);
-
-    console.log(chapterText);
-
-    writeFileSync(`tmp\\${chapterIndex} - ${chapterTitle?.replace(/[^A-Za-z0-9_.]*/g, '_')}.txt`, chapterText);
-  }
-
-  while (true) {
-    try {
-      await scrapeChapter(page, chapterIndex++);
-
-      let nextPageHandle = await page.$(".btn-wi.btn-next");
-      if (nextPageHandle) {
-        await nextPageHandle.click();
-
-        await new Promise((a) => setTimeout(a, 5000));
-        await page.waitForSelector(paragraphSelector);
-      } else {
-        break;
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    //chapter-title
-    //btn-wi btn-next
-  }
-
-  if (!isPageOpenInSession) {
-    await page.close();
-  }
-
-  await browser.disconnect();
-})();
-
-//btn-wi btn-next
+main();
