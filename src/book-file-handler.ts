@@ -33,7 +33,7 @@ export class BookFileHandler {
 
   writeFullBook(bookChapters: string[]) {
     writeFileSync(
-      join(this.bookPath, `${this.bookTitle}.html`),
+      join(this.bookPath, `${cleanIllegalCharacters(this.bookTitle)}.html`),
       `
       <body>
         ${bookChapters.join(`\n\n`)}
