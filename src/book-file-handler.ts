@@ -9,22 +9,16 @@ export class BookFileHandler {
 
   constructor(bookTitle: string) {
     this.bookTitle = bookTitle;
-		this.bookPath = getBookPath(bookTitle); 
+    this.bookPath = getBookPath(bookTitle);
   }
 
   writeMetaFile(book: Book) {
-		const meta = Object.assign({}, book);
-		meta.chapters = []; //don't write the entire book to the meta file.
-    writeFileSync(join(this.bookPath, cleanIllegalCharacters(this.bookTitle) + ".json"), JSON.stringify(meta));
-  }
-
-  loadExistintChapters(): string[] {
-    const files = readdirSync(this.bookPath);
-    return files.map((chapterFileName) => {
-      return readFileSync(join(this.bookPath, chapterFileName), {
-        encoding: "utf8",
-      });
-    });
+    const meta = Object.assign({}, book);
+    meta.chapters = []; //don't write the entire book to the meta file.
+    writeFileSync(
+      join(this.bookPath, cleanIllegalCharacters(this.bookTitle) + ".json"),
+      JSON.stringify(meta)
+    );
   }
 
   writeChapter(chapterIndex: number, chapter: string) {
@@ -43,8 +37,8 @@ export class BookFileHandler {
   }
 }
 
-export function prepareBookDirectory(book:Book) {
-	mkdirSync(join(BaseBookPath, cleanIllegalCharacters(book.title)));
+export function prepareBookDirectory(book: Book) {
+  mkdirSync(join(BaseBookPath, cleanIllegalCharacters(book.title)));
 }
 
 export function writeMetaFile(book: Book) {
@@ -55,12 +49,14 @@ export function writeMetaFile(book: Book) {
 }
 
 export function loadExistintChapters(book: Book) {
-  const files = readdirSync(getBookPath(book.title));
-  return files.filter(chapterFileName => chapterFileName.includes(".txt")).map((chapterFileName) => {
-    return readFileSync(join(getBookPath(book.title), chapterFileName), {
-      encoding: "utf8",
+  return readdirSync(getBookPath(book.title))
+    .filter((chapterFileName) => chapterFileName.includes(".txt"))
+    .sort((a, b) => +a.replace(".txt", "") - +b.replace(".txt", ""))
+    .map((chapterFileName) => {
+      return readFileSync(join(getBookPath(book.title), chapterFileName), {
+        encoding: "utf8",
+      });
     });
-  });
 }
 
 export function getBookPath(bookTitle: string): string {
@@ -68,10 +64,10 @@ export function getBookPath(bookTitle: string): string {
 }
 
 export function hasPreviousScrape(bookPath, bookTitle): boolean {
-	const dirs = readdirSync(BaseBookPath);
-	if(!dirs.includes(cleanIllegalCharacters(bookTitle))){
-		return false;
-	}
+  const dirs = readdirSync(BaseBookPath);
+  if (!dirs.includes(cleanIllegalCharacters(bookTitle))) {
+    return false;
+  }
 
   const files = readdirSync(bookPath);
   return files.includes(cleanIllegalCharacters(bookTitle) + ".json");
