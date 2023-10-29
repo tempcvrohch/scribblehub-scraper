@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, writeFileSync, mkdirSync } from "fs";
-import { Book } from "./book.js"
+import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { Book } from "./book.js";
 import { join } from "path";
 
 export const BaseBookPath = "tmp";
@@ -105,4 +105,10 @@ export function isValidMetaFile(book: Book): boolean {
 
 export function cleanIllegalCharacters(filename: string): string {
   return filename.replace(/[^A-Za-z0-9_]/g, "_");
+}
+
+export function ensureTmpDir() {
+  if (!existsSync("tmp")) {
+    mkdirSync("tmp");
+  }
 }
