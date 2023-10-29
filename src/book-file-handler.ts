@@ -1,4 +1,5 @@
 import { readdirSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { Book } from "./book.js"
 import { join } from "path";
 
 export const BaseBookPath = "tmp";

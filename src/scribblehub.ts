@@ -1,4 +1,5 @@
 import { Page, ElementHandle } from "puppeteer-core";
+import { Book } from "./book.js";
 
 export const ParagraphSelector = ".chp_raw";
 export enum NextChapterAvailabilityState {
