@@ -1,5 +1,7 @@
 name: Create release artifact
 
+on: workflow_call
+
 permissions: read-all
 
 jobs:
@@ -17,5 +19,5 @@ jobs:
       - run: npm build
       - run: mkdir artifacts
       - run: |
-        tar -czf artifacts/release.zip dist/
+          tar -czf artifacts/release.zip dist/
 
