@@ -1,0 +1,17 @@
+name: Create release artifact
+description: runs npm build and zips the dist folder to artifacts/release.zip
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 20
+    - run: npm ci
+      shell: bash
+    - run: npm build
+      shell: bash
+    - run: mkdir artifacts
+      shell: bash
+    - run: |
+        tar -czf artifacts/release.zip dist/
+      shell: bash

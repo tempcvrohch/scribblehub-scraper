@@ -21,10 +21,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 2
-      - uses: ./.github/workflows/create-release.yaml
+      - uses: ./.github/actions/create-artifact
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run:
-          gh release upload ${{ steps.release.outputs.tag_name }} ./artifact/release.zip
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./artifact/release.zip
