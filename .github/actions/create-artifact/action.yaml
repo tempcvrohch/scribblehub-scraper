@@ -8,7 +8,7 @@ runs:
         node-version: 20
     - run: npm ci
       shell: bash
-    - run: npm build
+    - run: npm run build
       shell: bash
     - run: mkdir artifacts
       shell: bash
