@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/tempcvrohch/scribblehub-scraper/compare/v1.0.0...v1.0.1) (2023-11-02)
+
+
+### Bug Fixes
+
+* type in artifacts folder ([bc7bb8e](https://github.com/tempcvrohch/scribblehub-scraper/commit/bc7bb8e15a1025978e4402ff52bd059841d7fc6f))
+
 ## 1.0.0 (2023-11-02)
 
 
