@@ -9,9 +9,6 @@ jobs:
     name: Create release artifact step
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
       - uses: actions/setup-node@v3
         with:
           node-version: 20

@@ -18,6 +18,9 @@ jobs:
         with:
           release-type: node
           package-name: scribblehub-scraper
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: ./.github/workflows/create-release.yaml
       - name: Upload Release Artifact
         if: ${{ steps.release.outputs.release_created }}
