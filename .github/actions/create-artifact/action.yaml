@@ -10,6 +10,8 @@ runs:
       shell: bash
     - run: npm run build
       shell: bash
+    - run: mkdir dist/tmp && cp .env dist/.env && mv dist/main.js dist/main.cjs
+      shell: bash
     - run: mkdir artifacts
       shell: bash
     - run: |
