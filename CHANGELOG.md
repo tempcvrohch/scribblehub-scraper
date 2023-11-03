@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/tempcvrohch/scribblehub-scraper/compare/v1.0.1...v1.1.0) (2023-11-03)
+
+
+### Features
+
+* **conf:** configurable nav timeout ([2d03f9e](https://github.com/tempcvrohch/scribblehub-scraper/commit/2d03f9eec20b3ced9ff95315b79d5c7a713ab5ca))
+
+
+### Bug Fixes
+
+* **build:** vscode build referring to old dir ([4e115a5](https://github.com/tempcvrohch/scribblehub-scraper/commit/4e115a56c29d1c847ef3db9c39f97f7b66b7a4ff))
+
 ## [1.0.1](https://github.com/tempcvrohch/scribblehub-scraper/compare/v1.0.0...v1.0.1) (2023-11-02)
 
 
