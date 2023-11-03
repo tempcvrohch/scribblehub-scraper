@@ -72,6 +72,9 @@ export default class Scraper {
   }
 
   async startScrape() {
+		const navTimeout = getNavTimeout();
+		console.log(`Using navigation timeout: ${navTimeout}`);
+
     let book = await lookupBookProperties(this.page);
     const bookPath = getBookPath(book.title);
     let chapterIndex = 0;
@@ -86,7 +89,7 @@ export default class Scraper {
       if (
         (await getChapterAvailabilityState(this.page)) === NextChapterAvailabilityState.AVAILABLE
       ) {
-        await navigateToNextChapter(this.page, ParagraphSelector);
+        await navigateToNextChapter(this.page, ParagraphSelector, navTimeout);
       }
     } else {
       console.log("Creating directory for: " + book.title + ".");
@@ -105,7 +108,7 @@ export default class Scraper {
       switch (await getChapterAvailabilityState(this.page)) {
         case NextChapterAvailabilityState.AVAILABLE: {
           console.log("Next chapter available, navigating...");
-          await navigateToNextChapter(this.page, ParagraphSelector);
+          await navigateToNextChapter(this.page, ParagraphSelector, navTimeout);
           console.log("Navigation complete.");
           break;
         }
@@ -122,4 +125,9 @@ export default class Scraper {
       }
     }
   }
+}
+
+export function getNavTimeout(): number {
+	const timeout:number  = process.env.NAV_TIMEOUT ? +process.env.NAV_TIMEOUT : 5000;
+	return timeout > 2000 ? timeout : 2000;
 }
